@@ -90,7 +90,7 @@ class OngletMacro(QWidget):
         # self.list.addItem(str(key))
         print(f'key:{key}')
 
-        rowPosition = self.table.rowCount()
+        # rowPosition = self.table.rowCount()
         self.table.add_list_to_row(0, [key])
 
 
@@ -129,12 +129,13 @@ class OngletMacro(QWidget):
             translatedFile = Translate.TradPyMgp(keys,'Code','pynput_key')
             print(translatedFile)
             translatedFile = [item for item in translatedFile if item != ['', '']]
+
             for row, (key, value) in enumerate(translatedFile):
                 print(row, key)
-                self.table.setItem(row, 0, QTableWidgetItem(str(key)))
+            print(translatedFile)
+            self.table.loadFileTable(row, translatedFile)
                 # self.table.setItem(row, 1, QTableWidgetItem(value))
-            self.table.setItem(row, 0, QTableWidgetItem(str(translatedFile[0])))
-            self.table.viewport().update()
+            # self.table.setItem(row, 0, QTableWidgetItem(str(translatedFile[0])))
 
 
 
