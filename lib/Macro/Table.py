@@ -69,7 +69,9 @@ class TableWidget(QTableWidget):
 		self.combo = QComboBox()
 		self.combo.addItems(["presser", "maintenir", "relâcher"]) 
 		self.setCellWidget(row, column, self.combo)
-		if value is not None or value is not False:
+		if value is not None and value is not False:
+			print(value)
+			print(type(value))
 			if value.lower() == 'up':
 				index = self.combo.findText('relâcher')
 				self.combo.setCurrentIndex(index) 

@@ -19,12 +19,20 @@ def TradPyMgp(keys, source, result):
 	key_mappings = load_key_mappings(file, source, result)
 
 	translated_keys = []
+	startKey= ""
 	for key in keys:
 		key = key.strip()
 		if source == 'pynput_key' and result == 'Code': # source == 'Code' and result == 'pynput_key':
 			# Pour les traductions directes
 			translated_key = key_mappings.get(key, "Touche non trouvée")
 		elif source == 'Code' and result == 'pynput_key':
+			for item in keys:
+				match = re.search(r"bindedkey=([A-Za-z])", key)
+			if match:
+
+				startKey = match.group(1)
+				print(startKey)
+
 			inverse_mappings = {v: k for k, v in key_mappings.items()}
 			translated_key = ['','']
 		# Trouve la première correspondance si plusieurs résultats
@@ -33,6 +41,7 @@ def TradPyMgp(keys, source, result):
 			if prefix_suffix:
 				prefix, suffix = prefix_suffix
 				translated_key[0] = inverse_mappings.get(prefix)
+				# startKey = inverse_mappings.get('bindedkey=')
 				if translated_key[0] == None :
 					translated_key[0]=prefix
 				else :
@@ -48,8 +57,10 @@ def TradPyMgp(keys, source, result):
 		
 		translated_keys.append(translated_key)
 		print(f'{key}: {translated_key}')
-	
-	return translated_keys
+	if startKey is not None:
+		return translated_keys, suffix, startKey
+	else : 
+		return translated_keys, suffix
 
 def extract_prefix(key):
 	# Motif regex pour trouver le préfixe 'SHIFT', 'CTRL', ou 'ALT' suivi de 'UP' ou 'DOWN'

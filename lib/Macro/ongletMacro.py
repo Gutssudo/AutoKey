@@ -126,8 +126,10 @@ class OngletMacro(QWidget):
             for ligne in lignes:
                 ligne = ligne.replace('e=', '').replace('}','').replace('{','')
                 keys.append(ligne)
-            translatedFile = Translate.TradPyMgp(keys,'Code','pynput_key')
+            translatedFile, suffix, startKey = Translate.TradPyMgp(keys,'Code','pynput_key')
             print(translatedFile)
+            if startKey is not None :
+                self.StartKeyBut.setText(startKey.lower())
             translatedFile = [item for item in translatedFile if item != ['', '']]
 
             for row, (key, value) in enumerate(translatedFile):
