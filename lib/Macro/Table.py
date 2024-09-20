@@ -73,7 +73,8 @@ class TableWidget(QTableWidget):
 		self.delayInput.setPlaceholderText("time (s)")
 		self.delayInput.setValidator(QDoubleValidator(0.99, 99.99, 2))
 		self.setCellWidget(row, column, self.delayInput)
-		self.delayInput.setText(str(value))
+		if value is not None : 
+			self.delayInput.setText(str(value))
 
 	def comboCell(self, row, column, value=None):
 		self.combo = QComboBox()

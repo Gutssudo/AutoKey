@@ -34,10 +34,12 @@ def formatSave(startKey, raw_actions):
 
     # Traiter chaque action brute
     for action in raw_actions:
-        if action[0] == 'delay':
-            # Si l'action est un délai, on l'ajoute avec la clé 'delay'
-            delay_time = int(action[1])  # Convertir le délai en millisecondes
-            data["actions"].append({"delay": delay_time})
+        if action[0] == 'delay' :
+            if action[1] is not None and action[1] != '':
+                print(action[1])
+                # Si l'action est un délai, on l'ajoute avec la clé 'delay'
+                delay_time = int(action[1])  # Convertir le délai en millisecondes
+                data["actions"].append({"delay": delay_time})
         else:
             # Si l'action est une touche à presser ou relâcher
             key = action[0]

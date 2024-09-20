@@ -1,7 +1,7 @@
 import os
 import sys
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTableWidgetItem, QLineEdit, QComboBox
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTableWidgetItem, QLineEdit, QComboBox, QMainWindow
 )
 from PyQt5.QtGui import QIcon
 from pynput.keyboard import Controller

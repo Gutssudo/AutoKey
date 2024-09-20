@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
 from lib.AFK.ongletAFK import OngletAFK  # Importer la classe OngletAFK depuis le fichier onglet_afk.py
 from lib.Macro.ongletMacro import OngletMacro
-
+import multiprocessing
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         self.tab2.Stop()
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
