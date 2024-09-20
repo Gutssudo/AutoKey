@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("AutoKey")
         self.setGeometry(100, 100, 250, 300)
-        self.setFixedWidth(320)
+        # self.setFixedWidth(320)
         # Création des onglets
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
@@ -21,6 +21,11 @@ class MainWindow(QMainWindow):
 
         self.tabs.addTab(self.tab1, "Anti-AFK")
         self.tabs.addTab(self.tab2, "Macro")
+    
+    
+
+    def closeEvent(self, event):
+        self.tab2.Stop()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -1,55 +1,53 @@
-# onglet_afk.py
+import os
+import sys
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidget,
-    QCheckBox, QButtonGroup, QLineEdit,QFileDialog, QTableWidgetItem
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTableWidgetItem, QLineEdit, QComboBox
 )
-from PyQt5.QtGui import QIcon, QDoubleValidator
+from PyQt5.QtGui import QIcon
+from pynput.keyboard import Controller
+import threading
+from . import Table, RecFile, Translate, PlayFile, SaveFile
 
-from pynput.keyboard import Listener, KeyCode, Controller, Key
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
-from . import Table, RecFile, Translate
 class OngletMacro(QWidget):
     def __init__(self):
         super().__init__()
-
-        # Layout principal vertical pour l'onglet
+        self.stopbool = True
         self.mainLayout = QVBoxLayout()
-
-        # Layout horizontal pour les boutons
         self.buttonLayout = QHBoxLayout()
+
         self.RECbutton = QPushButton("Rec")
         self.buttonLayout.addWidget(self.RECbutton)
         self.RECbutton.clicked.connect(self.addKey)
-        self.RECIcon = QIcon("ico/record.png")
+        self.RECIcon = QIcon(resource_path("ico/record.png"))
         self.RECbutton.setIcon(self.RECIcon)
-
 
         self.LOADbutton = QPushButton("Load")
         self.buttonLayout.addWidget(self.LOADbutton)
         self.LOADbutton.clicked.connect(self.loadFile)
-        self.LOADIcon = QIcon("ico/loadFile.png")
+        self.LOADIcon = QIcon(resource_path("ico/loadFile.png"))
         self.LOADbutton.setIcon(self.LOADIcon)
 
         self.RESETbutton = QPushButton("Reset")
         self.buttonLayout.addWidget(self.RESETbutton)
         self.RESETbutton.clicked.connect(self.Reset)
-        self.RESETIcon = QIcon("ico/load.png")
+        self.RESETIcon = QIcon(resource_path("ico/load.png"))
         self.RESETbutton.setIcon(self.RESETIcon)
 
-        # Ajout du layout des boutons au layout principal
         self.mainLayout.addLayout(self.buttonLayout)
         self.HLayout = QHBoxLayout()
-        # Liste d'éléments
-        listKey = []
-        self.table = Table.TableWidget(actions=listKey)
-        self.table.setFixedWidth(217)
-        # self.table.set(217,150)
-
+        self.table = Table.TableWidget()
         self.HLayout.addWidget(self.table)
         self.VLayout = QVBoxLayout()
+
         self.Delaybutton = QPushButton("add Delay")
         self.Delaybutton.clicked.connect(self.table.addDelayItem)
-
 
         self.StartKeyBut = QPushButton("select\n Start Key...")
         self.StartKeyBut.clicked.connect(self.StartKey)
@@ -57,87 +55,113 @@ class OngletMacro(QWidget):
         self.VLayout.addWidget(self.Delaybutton)
         self.VLayout.addWidget(self.StartKeyBut)
 
-
         self.HLayout.addLayout(self.VLayout)
         self.mainLayout.addLayout(self.HLayout)
+        self.mainLayout.addStretch()
 
-
-        # Ajouter un espace entre le layout et le bouton Play
-
-
-        self.PSLayout = QHBoxLayout()
-        
         self.SaveButton = QPushButton("Save")
-        self.PSLayout.addWidget(self.SaveButton)
-        # self.SaveButton.clicked.connect(self.save_yaml)
-        self.SaveIcon = QIcon("ico/save.png")
+        self.mainLayout.addWidget(self.SaveButton)
+        self.SaveButton.clicked.connect(self.Save)
+        self.SaveIcon = QIcon(resource_path("ico/save.png"))
         self.SaveButton.setIcon(self.SaveIcon)
 
-        # Ajouter un bouton Play à la fin du layout principal
+        self.PSLayout = QHBoxLayout()
         self.PlayButton = QPushButton("Play")
-        # self.PlayButton.clicked.connect(self.Play)
-        self.PlayIcon = QIcon("ico/play.png")
+        self.PlayButton.clicked.connect(self.Play)
+        self.PlayIcon = QIcon(resource_path("ico/play.png"))
         self.PlayButton.setIcon(self.PlayIcon)
 
         self.PSLayout.addWidget(self.PlayButton)
 
+        self.StopButton = QPushButton("Stop")
+        self.StopButton.clicked.connect(self.Stop)
+        self.StopIcon = QIcon(resource_path("ico/stop.png"))
+        self.StopButton.setIcon(self.StopIcon)
+
+        self.PSLayout.addWidget(self.StopButton)
         self.mainLayout.addLayout(self.PSLayout)
-        # Appliquer le layout principal à l'onglet
-        self.setLayout(self.mainLayout) 
+        self.setLayout(self.mainLayout)
 
     def addKey(self):
         key = str(RecFile.RecFunc())
-        # self.list.addItem(str(key))
         print(f'key:{key}')
-
-        rowPosition = self.table.rowCount()
-        self.table.add_list_to_row(0, [key])
-
-
-    def addDelay(self):
-        key = str(RecFile.RecFunc())
-        rowPosition = self.table.rowCount()
-        self.table.insertRow(rowPosition)
-        self.table.setItem(rowPosition,0,QTableWidgetItem(key))
+        self.table.addActions(0, key)
+        self.table.Colum1Row(self.table.rowCount() - 1)
 
     def Reset(self):
         self.table.RemoveAllRow()
         self.StartKeyBut.setText("select\n Start Key...")
 
     def open_file_dialog(self):
-        # Ouvrir la boîte de dialogue de sélection de fichiers
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Sélectionner un Fichier", "",
                                                    "Tous les fichiers (*);;Fichier xml (*.xml);;Fichier txt (*.txt)", options=options)
-        file_path=(str(file_name))
-        return file_name, file_path
+        return file_name
 
     def loadFile(self):
-        keys =[]
-        file,file_path = self.open_file_dialog()
-        print(file_path)
-        with open(file, 'r') as file:
-    # Lire toutes les lignes dans une liste
-            lignes = file.readlines()
-
-        # for ligne in lignes:
-        #     print(ligne)
-        if file_path.endswith('.txt'):
-            for ligne in lignes:
-                ligne = ligne.replace('e=', '').replace('}','').replace('{','')
-                keys.append(ligne)
-            translatedFile = Translate.TradPyMgp(keys,'Code','pynput_key')
-            print(translatedFile)
-            translatedFile = [item for item in translatedFile if item != ['', '']]
-            for row, (key, value) in enumerate(translatedFile):
-                print(row, key)
-                self.table.setItem(row, 0, QTableWidgetItem(str(key)))
-                # self.table.setItem(row, 1, QTableWidgetItem(value))
-            self.table.setItem(row, 0, QTableWidgetItem(str(translatedFile[0])))
-            self.table.viewport().update()
-
-
+        self.Reset()
+        keys = []
+        try:
+            file = self.open_file_dialog()
+            if file:
+                file_path = str(file)
+                if file_path.endswith('.txt'):
+                    yaml = False
+                    with open(file, 'r') as file:
+                        lignes = file.readlines()
+                    for ligne in lignes:
+                        ligne = ligne.replace('e=', '').replace('}', '').replace('{', '')
+                        keys.append(ligne)
+                    translatedFile, suffix, startKey = Translate.TradPyMgp(keys, 'Code', 'pynput_key')
+                elif file_path.endswith('.yaml'):
+                    yaml = True
+                    startKey, translatedFile = Translate.TradYamlPy(file_path)
+                if startKey is not None:
+                    self.StartKeyBut.setText(startKey.lower() if len(startKey) == 1 else startKey)
+                translatedFile = [item for item in translatedFile if item != ['', '']]
+                self.table.loadFileTable(translatedFile, yaml)
+        except Exception as e:
+            print(f"Erreur : {e}")
 
     def StartKey(self):
         StartKey = RecFile.RecFunc()
         self.StartKeyBut.setText(str(StartKey))
+
+    def Play(self):
+        self.Stop()
+        actions = self.getTableContent()
+        startKey = self.StartKeyBut.text()
+        print(startKey)
+        self.playobj = PlayFile.PlayFile(actions, startKey)
+        self.stopbool = False
+
+    def getTableContent(self):
+        content = []
+        rowCount = self.table.rowCount()
+        columnCount = self.table.columnCount()
+        for row in range(rowCount):
+            rowData = []
+            for column in range(columnCount):
+                item = self.table.item(row, column)
+                if column == 0:
+                    rowData.append(item.text())
+                else:
+                    item = self.table.cellWidget(row, column)       
+                    if isinstance(item, QLineEdit):
+                        rowData.append(item.text())
+                    elif isinstance(item, QComboBox):
+                        rowData.append(item.currentText())
+            content.append(rowData)
+
+        formattedContent = [[row[0], row[1]] for row in content]
+        return formattedContent
+
+    def Stop(self):
+        if self.stopbool is not True:             
+            self.playobj.killProcess()
+            print('Process kill')
+
+    def Save(self):
+        actions = self.getTableContent()
+        startKey = self.StartKeyBut.text()
+        SaveFile.save(self, startKey, actions)

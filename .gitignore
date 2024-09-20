@@ -1,0 +1,27 @@
+# Ignorer le dossier de l'environnement virtuel
+.venv/
+
+# Ignorer les dossiers de cache
+__pycache__/
+**/__pycache__/
+**.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Ignorer les fichiers temporaires de l'éditeur
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Ignorer les fichiers de configuration spécifiques aux IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
