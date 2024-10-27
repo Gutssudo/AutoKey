@@ -104,10 +104,10 @@ class OngletMacro(QWidget):
         try:
             file = self.open_file_dialog()
             if file:
-                file_path = str(file)
+                file_path = os.path.abspath(str(file))
                 if file_path.endswith('.txt'):
                     yaml = False
-                    with open(file, 'r') as file:
+                    with open(file_path, 'r') as file:
                         lignes = file.readlines()
                     for ligne in lignes:
                         ligne = ligne.replace('e=', '').replace('}', '').replace('{', '')
